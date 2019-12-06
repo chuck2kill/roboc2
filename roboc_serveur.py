@@ -3,9 +3,22 @@
 """Ce fichier contient le code principal du serveur roboc"""
 
 import os
+import socket
 
 from classes.carte import Carte
 from classes.labyrinthe import charger_labyrinthe
+
+# Initialisation de la connexion
+hote = ''
+port = 21000
+connexion_principale = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+connexion_principale.bind((hote, port))
+connexion_principale.listen(5)
+print("Le serveur écoute sur le port {}".format(port))
+
+connexion_avec_client, infos_connexion = connexion_principale.accept()
+
+
 
 # On charge les cartes existantes
 cartes = []
@@ -24,8 +37,12 @@ for nom_fichier in os.listdir("cartes"):
 
 # On affiche les cartes existantes
 print("Labyrinthes existants :")
+connexion_avec_client.send(b"Labyrinthes existants")
 for i, carte in enumerate(cartes):
     print(" {} - {}".format(i + 1, carte.nom))
+    liste_labyrinthes = (" {} - {}".format(i + 1, carte.nom))
+    liste_labyrinthes = liste_labyrinthes.encode()
+    connexion_avec_client.send(liste_labyrinthes)
 
 # S'il y a une partie sauvegardée
 partie = charger_labyrinthe()
