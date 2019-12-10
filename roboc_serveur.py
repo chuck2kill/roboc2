@@ -15,11 +15,13 @@ connexion_principale.bind((hote, port))
 connexion_principale.listen(5)
 print("Le serveur écoute sur le port {}".format(port))
 
-nb_joueurs = input("Entrez le nombre de joueurs : ")
-try:
-    nb_joueurs = int(nb_joueurs)
-except:
-    ValueError ("On attend un chiffre !!")
+nb_joueurs = str
+while type(nb_joueurs) is not int:
+    nb_joueurs = input("Entrez le nombre de joueurs : ")
+    try:
+        nb_joueurs = int(nb_joueurs)
+    except ValueError:
+        print("On attend un chiffre !!")
 
 # On charge les cartes existantes
 cartes = []
@@ -38,12 +40,9 @@ for nom_fichier in os.listdir("cartes"):
 
 # On affiche les cartes existantes
 print("Labyrinthes existants :")
-#connexion_avec_client.send(b"Labyrinthes existants\n")
 for i, carte in enumerate(cartes):
     print(" {} - {}".format(i + 1, carte.nom))
     liste_labyrinthes = (" {} - {}\n".format(i + 1, carte.nom))
-    #liste_labyrinthes = liste_labyrinthes.encode()
-    #connexion_avec_client.send(liste_labyrinthes)
 
 # Choix de la carte
 labyrinthe = None
@@ -69,23 +68,13 @@ while labyrinthe is None:
             carte = cartes[choix - 1]
             labyrinthe = carte.labyrinthe
 
-
-serveur_lance = 0
 clients_connectes = []
-while serveur_lance < nb_joueurs:
+while len(clients_connectes) < nb_joueurs:
     connexions_demandees, wlist, xlist = select.select([connexion_principale], [], [], 0.05)
 
     for connexion in connexions_demandees:
         connexion_avec_client, infos_connexion = connexion.accept()
         clients_connectes.append(connexion_avec_client)
-
-    clients_a_lire = []
-    try:
-        clients_a_lire, wlist, xlist = select.select(clients_connectes, [], [], 0.05)
-    except select.error:
-        pass
-    else:
-        serveur_lance += 1
 
 # Maintenant, affiche la carte et permet de jouer à chaque tour
 labyrinthe.afficher()
