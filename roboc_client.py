@@ -16,14 +16,10 @@ print("Connexion établie avec le serveur sur le port {}".format(port))
 #joueur = input("Entrez votre pseudo : ")
 
 
-msg_a_envoyer = b""
-while msg_a_envoyer != b"fin":
-    #msg_a_envoyer = input("> ")
-    #msg_a_envoyer = msg_a_envoyer.encode()
-    #connexion_serveur.send(msg_a_envoyer)
-    msg_recu = connexion_serveur.recv(1024)
-    carte = pickle.loads(msg_recu)
-    print(carte)
+
+msg_recu = connexion_serveur.recv(1024)
+carte = msg_recu.decode()
+print(carte)
 
 os.system("pause")
 print("Fermeture")

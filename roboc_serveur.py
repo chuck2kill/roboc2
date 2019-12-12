@@ -5,7 +5,7 @@
 import socket, select, pickle, os
 
 from classes.carte import Carte
-from classes.labyrinthe import charger_labyrinthe
+from classes.labyrinthe import *
 
 # Initialisation de la connexion
 hote = ''
@@ -68,16 +68,54 @@ while labyrinthe is None:
             carte = cartes[choix - 1]
             labyrinthe = carte.labyrinthe
 
-clients_connectes = []
-while len(clients_connectes) < nb_joueurs:
-    connexions_demandees, wlist, xlist = select.select([connexion_principale], [], [], 0.05)
+print("On attend les clients")
 
+i = 0
+#bienvenue = "Bienvenue joueur {}".format(i + 1)
+#bienvenue = bienvenue.encode()
+serveur = True
+clients_connectes = []
+while serveur:
+    connexions_demandees, wlist, xlist = select.select([connexion_principale], [], [], 0.05)
     for connexion in connexions_demandees:
         connexion_avec_client, infos_connexion = connexion.accept()
         clients_connectes.append(connexion_avec_client)
+        bienvenue = []
+        for i, connexion in enumerate(clients_connectes):
+            bienvenue.append("Bienvenue joueur {}, votre socket est {}".format(i + 1, connexion))
+            bienvenue[i] = bienvenue[i].encode()
+            clients_connectes[i].send(bienvenue[i])
+            #data1 = contenu.encode()
+            #clients_connectes[i].send(data1)
+    if len(clients_connectes) == nb_joueurs:
+        serveur = False
+        data1 = contenu.encode()
+        clients_connectes[i].send(data1)
+
+#clients_connectes = []
+#while len(clients_connectes) != nb_joueurs:
+#    continue
+
+#connexions_demandees, wlist, xlist = select.select([connexion_principale], [], [], 0.05)
+bienvenue = []
+#for i, connexion in enumerate(clients_connectes):
+#    bienvenue.append("Bienvenue joueur {}, votre socket est {}".format(i + 1, connexion))
+#    bienvenue[i] = bienvenue[i].encode()
+#    clients_connectes[i].send(bienvenue[i])
+#    data1 = contenu.encode()
+#    clients_connectes[i].send(data1)
 
 # Maintenant, affiche la carte et permet de jouer à chaque tour
-labyrinthe.afficher()
+#labyrinthe.afficher()
+
+
+data1 = contenu.encode()
+#i = 0
+#bienvenue = "Bienvenue joueur {}".format(i + 1)
+#bienvenue = bienvenue.encode()
+#while i < nb_joueurs:
+#    clients_connectes[i].send(data1)
+#    i += 1
 while not labyrinthe.gagnee:
     coup = input("> ")
     if coup == "":
