@@ -24,15 +24,18 @@ while type(nb_joueurs) is not int:
         print("On attend un chiffre !!")
 
 # On charge les cartes existantes
+chemin = None
 cartes = []
 for nom_fichier in os.listdir("cartes"):
     if nom_fichier.endswith(".txt"):
         chemin = os.path.join("cartes", nom_fichier)
         nom_carte = nom_fichier[:-4].lower()
         with open(chemin, "r") as fichier:
-            contenu = fichier.read()
+            lecture = fichier.read()
+            contenu = []
+            contenu.append(lecture)
             try:
-                carte = Carte(nom_carte, contenu)
+                carte = Carte(nom_carte, contenu[0])
             except ValueError as err:
                 print("Erreur lors de la lecture de {} : {}".format(chemin, str(err)))
             else:
@@ -45,8 +48,10 @@ for i, carte in enumerate(cartes):
     liste_labyrinthes = (" {} - {}\n".format(i + 1, carte.nom))
 
 # Choix de la carte
+carte = None
 labyrinthe = None
 partie = True
+choix = 0
 while labyrinthe is None:
     choix = input("Entrez un numéro de labyrinthe pour commencer à jouer : ")
     if choix.lower() == "r":
@@ -71,9 +76,16 @@ while labyrinthe is None:
 print("On attend les clients")
 
 i = 0
-#bienvenue = "Bienvenue joueur {}".format(i + 1)
-#bienvenue = bienvenue.encode()
+vrai_chemin = None
+for fichier in os.listdir("cartes"):
+    if fichier.endswith(".txt"):
+        chemin = os.listdir("cartes")[choix - 1]
+
 serveur = True
+vrai_chemin = os.path.join("cartes", chemin)
+with open(vrai_chemin, "r") as fichier:
+    contenu_carte = fichier.read()
+
 clients_connectes = []
 while serveur:
     connexions_demandees, wlist, xlist = select.select([connexion_principale], [], [], 0.05)
@@ -81,41 +93,21 @@ while serveur:
         connexion_avec_client, infos_connexion = connexion.accept()
         clients_connectes.append(connexion_avec_client)
         bienvenue = []
+
         for i, connexion in enumerate(clients_connectes):
-            bienvenue.append("Bienvenue joueur {}, votre socket est {}".format(i + 1, connexion))
+            bienvenue.append("Bienvenue joueur {}, votre socket est {}\n".format(i + 1, connexion))
             bienvenue[i] = bienvenue[i].encode()
             clients_connectes[i].send(bienvenue[i])
-            #data1 = contenu.encode()
-            #clients_connectes[i].send(data1)
+
     if len(clients_connectes) == nb_joueurs:
         serveur = False
-        data1 = contenu.encode()
+        data1 = contenu_carte.encode()
         clients_connectes[i].send(data1)
 
-#clients_connectes = []
-#while len(clients_connectes) != nb_joueurs:
-#    continue
-
-#connexions_demandees, wlist, xlist = select.select([connexion_principale], [], [], 0.05)
 bienvenue = []
-#for i, connexion in enumerate(clients_connectes):
-#    bienvenue.append("Bienvenue joueur {}, votre socket est {}".format(i + 1, connexion))
-#    bienvenue[i] = bienvenue[i].encode()
-#    clients_connectes[i].send(bienvenue[i])
-#    data1 = contenu.encode()
-#    clients_connectes[i].send(data1)
 
-# Maintenant, affiche la carte et permet de jouer à chaque tour
-#labyrinthe.afficher()
+data1 = contenu_carte.encode()
 
-
-data1 = contenu.encode()
-#i = 0
-#bienvenue = "Bienvenue joueur {}".format(i + 1)
-#bienvenue = bienvenue.encode()
-#while i < nb_joueurs:
-#    clients_connectes[i].send(data1)
-#    i += 1
 while not labyrinthe.gagnee:
     coup = input("> ")
     if coup == "":
