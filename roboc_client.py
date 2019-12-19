@@ -21,6 +21,10 @@ msg_recu = connexion_serveur.recv(1024)
 carte = msg_recu.decode()
 print(carte)
 
+commencer = input("Appuyez sur C pour commencer la partie\n").lower()
+
+
+
 os.system("pause")
 print("Fermeture")
 connexion_serveur.close()

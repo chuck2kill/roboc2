@@ -81,11 +81,13 @@ for fichier in os.listdir("cartes"):
     if fichier.endswith(".txt"):
         chemin = os.listdir("cartes")[choix - 1]
 
+# On ouvre la bonne carte
 serveur = True
 vrai_chemin = os.path.join("cartes", chemin)
 with open(vrai_chemin, "r") as fichier:
     contenu_carte = fichier.read()
 
+# On reçoit la connexion des clients et on leur envoie la carte de départ
 clients_connectes = []
 while serveur:
     connexions_demandees, wlist, xlist = select.select([connexion_principale], [], [], 0.05)
@@ -98,11 +100,13 @@ while serveur:
             bienvenue.append("Bienvenue joueur {}, votre socket est {}\n".format(i + 1, connexion))
             bienvenue[i] = bienvenue[i].encode()
             clients_connectes[i].send(bienvenue[i])
+            data1 = contenu_carte.encode()
+            clients_connectes[i].send(data1)
 
     if len(clients_connectes) == nb_joueurs:
         serveur = False
-        data1 = contenu_carte.encode()
-        clients_connectes[i].send(data1)
+        #data1 = contenu_carte.encode()
+        #clients_connectes[i].send(data1)
 
 bienvenue = []
 

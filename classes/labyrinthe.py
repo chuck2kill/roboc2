@@ -4,6 +4,7 @@
 
 import os
 import pickle
+import random
 
 from classes.mur import Mur
 from classes.porte import Porte
@@ -27,7 +28,7 @@ class Labyrinthe:
         obstacles -- une liste des obstacles déjà positionnés
 
     Pour créer un labyrinthe à partir d'une chaine (par exemple à partir
-    d'un fichier), considérez la fonction 'creer_labyrinthe_depuis_chiane'
+    d'un fichier), considérez la fonction 'creer_labyrinthe_depuis_chaine'
     définie au-dessous de la classe"""
 
     limite_x = 20
@@ -181,13 +182,16 @@ def creer_labyrinthe_depuis_chaine(chaine):
         elif lettre.lower() in symboles:
             classe = symboles[lettre.lower()]
             objet = classe(x, y)
-            if type(objet) is Robot:
-                if robot:
-                    raise ValueError("Il ne peut y avoir qu'un robot.")
+            robot.x = random.randrange(x)
+            robot.y = random.randrange(y)
+            robot = (robot.x, robot.y)
+            #if type(objet) is Robot:
+            #    if robot:
+            #        raise ValueError("Il ne peut y avoir qu'un robot.")
 
-                robot = objet
-            else:
-                obstacles.append(objet)
+            #    robot = objet
+            #else:
+            #    obstacles.append(objet)
         else:
             raise ValueError("Symbole inconnu {}".format(lettre))
 
